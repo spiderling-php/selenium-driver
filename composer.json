@@ -1,0 +1,22 @@
+{
+    "name": "spiderling-php/selenium-driver",
+    "description": "Selenium crawler for spiderling",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Ivan Kerin",
+            "email": "ikerin@gmail.com",
+            "role": "Author"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "SP\\Driver\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SP\\Driver\\Test\\": "tests/src/"
+        }
+    }
+}
