@@ -9,14 +9,24 @@
             "role": "Author"
         }
     ],
+    "require": {
+        "spiderling-php/attempt" : "^0.1",
+        "spiderling-php/spiderling" : "dev-master",
+        "symfony/process" : "^3.0",
+        "guzzlehttp/guzzle" : "^6.1",
+        "psr/log" : "^1.0"
+    },
+    "require-dev": {
+        "spiderling-php/driver-test" : "dev-master"
+    },
     "autoload": {
         "psr-4": {
-            "SP\\Driver\\": "src/"
+            "SP\\SeleniumDriver\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SP\\Driver\\Test\\": "tests/src/"
+            "SP\\SeleniumDriver\\Test\\": "tests/src/"
         }
     }
 }
