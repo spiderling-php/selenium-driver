@@ -5,6 +5,7 @@ Selenium Driver
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/spiderling-php/selenium-driver/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/spiderling-php/selenium-driver/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/spiderling-php/selenium-driver/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/spiderling-php/selenium-driver/?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/spiderling-php/selenium-driver/v/stable)](https://packagist.org/packages/spiderling-php/selenium-driver)
+
 Selenium crawler for spiderling
 
 Installation
