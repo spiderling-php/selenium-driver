@@ -23,7 +23,27 @@ class ClientTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::newSessionClient
+     */
+    public function testNewSessionClient()
+    {
+        $client = $this->getMock('SP\SeleniumDriver\Client', ['postJson']);
+
+        $client
+            ->expects($this->once())
+            ->method('postJson')
+            ->with('session', ['desiredCapabilities' => ['browserName' => 'firefox']])
+            ->willReturn(['state' => 'success', 'sessionId' => '379128379']);
+
+        $return = $client->newSessionClient();
+
+        $this->assertInstanceOf('SP\SeleniumDriver\Client', $return);
+        $this->assertEquals('http://127.0.0.1:4444/wd/hub/session/379128379/', (string) $return->getConfig('base_uri'));
+    }
+
+    /**
      * @covers ::getJson
+     * @covers ::parseResponse
      */
     public function testGetJson()
     {
@@ -42,6 +62,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::deleteJson
+     * @covers ::parseResponse
      */
     public function testDeleteJson()
     {

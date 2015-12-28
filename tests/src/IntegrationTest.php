@@ -12,7 +12,15 @@ class IntegrationTest extends BrowserDriverTest
     {
         parent::setUpBeforeClass();
 
-        $driver = new Browser();
+        $base_uri = sprintf(
+            'http://%s:%s@localhost:4445/wd/hub/',
+            getenv('SAUCE_USERNAME'),
+            getenv('SAUCE_ACCESS_KEY')
+        );
+
+        $client = new Client(['base_uri' => $base_uri]);
+
+        $driver = new Browser($client->newSessionClient());
 
         self::setDriver($driver);
     }

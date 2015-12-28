@@ -235,7 +235,13 @@ class Browser implements BrowserInterface
         $this->client->postJson("element/{$id}/click");
     }
 
-    public function getElementId($element)
+    /**
+     * Convert a selenium element to an id
+     *
+     * @param  array $element
+     * @return string
+     */
+    public function convertElement(array $element)
     {
         return $element['ELEMENT'];
     }
@@ -251,7 +257,7 @@ class Browser implements BrowserInterface
             ['using' => 'xpath', 'value' => '.'.$query->getXPath()]
         );
 
-        return array_map([$this, 'getElementId'], $elements);
+        return array_map([$this, 'convertElement'], $elements);
     }
 
     /**
@@ -266,7 +272,7 @@ class Browser implements BrowserInterface
             ['using' => 'xpath', 'value' => '.'.$query->getXPath()]
         );
 
-        return array_map([$this, 'getElementId'], $elements);
+        return array_map([$this, 'convertElement'], $elements);
     }
 
     /**

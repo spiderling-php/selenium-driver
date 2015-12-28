@@ -30,8 +30,9 @@ class Client extends GuzzleClient
             : ['desiredCapabilities' => ['browserName' => 'firefox']];
 
         $session = $this->postJson('session', $options);
+        $baseSessionUri = $this->getConfig('base_uri')."session/{$session['sessionId']}/";
 
-        return new SessionClient($session['sessionId'], $this->getConfig());
+        return new SessionClient($baseSessionUri, $this->getConfig());
     }
 
     public function parseResponse(ResponseInterface $response)

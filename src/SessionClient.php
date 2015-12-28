@@ -4,6 +4,7 @@ namespace SP\SeleniumDriver;
 
 use GuzzleHttp\Client as GuzzleClient;
 use Psr\Http\Message\ResponseInterface;
+use InvalidArgumentException;
 
 /**
  * @author    Ivan Kerin <ikerin@gmail.com>
@@ -12,12 +13,12 @@ use Psr\Http\Message\ResponseInterface;
  */
 class SessionClient extends Client
 {
-    public function __construct($sessionId, array $config = [])
+    public function __construct($baseSessionUri, array $config = [])
     {
         parent::__construct(
             array_merge(
                 $config,
-                ['base_uri' => $config['base_uri'].'session/'.$sessionId.'/']
+                ['base_uri' => $baseSessionUri]
             )
         );
     }

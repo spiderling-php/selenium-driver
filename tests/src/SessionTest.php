@@ -10,6 +10,9 @@ use SP\SeleniumDriver\Session;
  */
 class SessionTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers ::__construct
+     */
     public function testConstruct()
     {
         $browser = $this
@@ -22,12 +25,5 @@ class SessionTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('SP\Spiderling\BrowserInterface', $session->getBrowser());
 
         $this->assertSame($browser, $session->getBrowser());
-    }
-
-    public function testConstructDefault()
-    {
-        $session = new Session();
-
-        $this->assertInstanceOf('SP\SeleniumDriver\Browser', $session->getBrowser());
     }
 }

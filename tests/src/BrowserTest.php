@@ -151,15 +151,15 @@ class BrowserTest extends PHPUnit_Framework_TestCase
     public function dataQuerySelectors()
     {
         return [
-            [
-                'getElementIds',
-                [new Query\Css('#test')],
+            'Query without parent' => [
+                new Query\Css('#test'),
+                null,
                 'elements',
                 ['using' => 'xpath', 'value' => './/*[@id = \'test\']']
             ],
-            [
-                'getChildElementIds',
-                [new Query\Css('#me'), 12],
+            'Query with parent node' => [
+                new Query\Css('#me'),
+                12,
                 'element/12/elements',
                 ['using' => 'xpath', 'value' => './/*[@id = \'me\']']
             ],
@@ -168,10 +168,12 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider dataQuerySelectors
+     * @covers ::convertElement
+     * @covers ::queryIds
      * @covers ::getElementIds
      * @covers ::getChildElementIds
      */
-    public function testQuerySelectors($method, $params, $uri, $value)
+    public function testQuerySelectors($query, $parent, $uri, $value)
     {
         $this->client
             ->expects($this->once())
@@ -179,7 +181,7 @@ class BrowserTest extends PHPUnit_Framework_TestCase
             ->with($uri, $value)
             ->willReturn([['ELEMENT' => 3], ['ELEMENT' => 6]]);
 
-        $result = call_user_func_array([$this->driver, $method], $params);
+        $result = $this->driver->queryIds($query, $parent);
 
         $this->assertEquals([3, 6], $result);
     }
@@ -212,8 +214,65 @@ class BrowserTest extends PHPUnit_Framework_TestCase
             ->method('postJson')
             ->with('element/3/value', ['value' => ['n', 'e', 'w']]);
 
-
         $this->driver->setValue(3, 'new');
+    }
+
+    /**
+     * @covers ::setFile
+     */
+    public function testSetFile()
+    {
+        $this->client
+            ->expects($this->once())
+            ->method('postJson')
+            ->with('element/3/value', ['value' => ['f', 'i', 'l', 'e', '.', 'j', 'p', 'g']]);
+
+        $this->driver->setFile(3, 'file.jpg');
+    }
+
+    /**
+     * @covers ::getValue
+     */
+    public function testGetValueTextarea()
+    {
+        $this->client
+            ->expects($this->at(0))
+            ->method('getJson')
+            ->with('element/3/name')
+            ->willReturn('textarea');
+
+        $this->client
+            ->expects($this->at(1))
+            ->method('getJson')
+            ->with('element/3/text')
+            ->willReturn('some text');
+
+
+        $result = $this->driver->getValue(3);
+
+        $this->assertEquals('some text', $result);
+    }
+
+    /**
+     * @covers ::getValue
+     */
+    public function testGetValueInput()
+    {
+        $this->client
+            ->expects($this->at(0))
+            ->method('getJson')
+            ->with('element/5/name')
+            ->willReturn('input');
+
+        $this->client
+            ->expects($this->at(1))
+            ->method('getJson')
+            ->with('element/5/attribute/value')
+            ->willReturn('some input text');
+
+        $result = $this->driver->getValue(5);
+
+        $this->assertEquals('some input text', $result);
     }
 
     /**
@@ -272,14 +331,10 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider dataGetters
-     * @covers ::getJsMessages
-     * @covers ::getJsErrors
      * @covers ::getFullHtml
      * @covers ::getText
      * @covers ::getTagName
      * @covers ::getAttribute
-     * @covers ::getHtml
-     * @covers ::getValue
      * @covers ::isVisible
      * @covers ::isSelected
      * @covers ::isChecked
