@@ -20,7 +20,15 @@ class IntegrationTest extends BrowserDriverTest
 
         $client = new Client(['base_uri' => $base_uri]);
 
-        $driver = new Browser($client->newSessionClient());
+        $capabilities = [
+            'browserName' => 'firefox',
+        ];
+
+        if (getenv('TRAVIS_JOB_NUMBER')) {
+            $capabilities['tunnel-identifier'] = getenv('TRAVIS_JOB_NUMBER');
+        }
+
+        $driver = new Browser($client->newSessionClient($capabilities));
 
         self::setDriver($driver);
     }
