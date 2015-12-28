@@ -451,12 +451,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/spiderling-php/driver-test.git",
-                "reference": "42323b9e4d21e254e6dbca6bc780863e3ca22871"
+                "reference": "7eed00e146af6ee54e09702f1bb01ce0412fc40d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spiderling-php/driver-test/zipball/42323b9e4d21e254e6dbca6bc780863e3ca22871",
-                "reference": "42323b9e4d21e254e6dbca6bc780863e3ca22871",
+                "url": "https://api.github.com/repos/spiderling-php/driver-test/zipball/7eed00e146af6ee54e09702f1bb01ce0412fc40d",
+                "reference": "7eed00e146af6ee54e09702f1bb01ce0412fc40d",
                 "shasum": ""
             },
             "require": {
@@ -481,7 +481,7 @@
                 }
             ],
             "description": "Integration tests for spiderling drivers",
-            "time": "2015-12-28 12:58:53"
+            "time": "2015-12-28 13:08:47"
         }
     ],
     "aliases": [],
