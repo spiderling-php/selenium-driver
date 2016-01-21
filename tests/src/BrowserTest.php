@@ -5,6 +5,7 @@ namespace SP\SeleniumDriver\Test;
 use PHPUnit_Framework_TestCase;
 use SP\SeleniumDriver\Browser;
 use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\Psr7\Response;
 use SP\Spiderling\Query;
 
 /**
@@ -18,11 +19,7 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->client = $this
-            ->getMockBuilder('SP\SeleniumDriver\SessionClient')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->client = $this->getMock('GuzzleHttp\ClientInterface');
         $this->driver = new Browser($this->client);
     }
 
@@ -44,8 +41,8 @@ class BrowserTest extends PHPUnit_Framework_TestCase
     {
         $this->client
             ->expects($this->once())
-            ->method('deleteJson')
-            ->with('cookie');
+            ->method('request')
+            ->with('delete', 'cookie');
 
         $this->driver->removeAllCookies();
     }
@@ -57,9 +54,9 @@ class BrowserTest extends PHPUnit_Framework_TestCase
     {
         $this->client
             ->expects($this->once())
-            ->method('getJson')
-            ->with('alert_text')
-            ->willReturn('alert...');
+            ->method('request')
+            ->with('get', 'alert_text')
+            ->willReturn(new Response(200, [], '{"value":"alert..."}'));
 
         $result = $this->driver->getAlertText();
 
@@ -73,13 +70,13 @@ class BrowserTest extends PHPUnit_Framework_TestCase
     {
         $this->client
             ->expects($this->at(0))
-            ->method('postJson')
-            ->with('accept_alert');
+            ->method('request')
+            ->with('post', 'accept_alert');
 
         $this->client
             ->expects($this->at(1))
-            ->method('postJson')
-            ->with('dismiss_alert');
+            ->method('request')
+            ->with('post', 'dismiss_alert');
 
         $this->driver->confirm(true);
         $this->driver->confirm(false);
@@ -90,17 +87,15 @@ class BrowserTest extends PHPUnit_Framework_TestCase
      */
     public function testGetUri()
     {
-        $expected = new Uri('http://example.com');
-
         $this->client
             ->expects($this->once())
-            ->method('getJson')
-            ->with('url')
-            ->willReturn((string) $expected);
+            ->method('request')
+            ->with('get', 'url')
+            ->willReturn(new Response(200, [], '{"value":"http:\/\/example.com"}'));
 
         $result = $this->driver->getUri();
 
-        $this->assertEquals($expected, $result);
+        $this->assertEquals(new Uri('http://example.com'), $result);
     }
 
     public function dataActions()
@@ -122,8 +117,8 @@ class BrowserTest extends PHPUnit_Framework_TestCase
     {
         $this->client
             ->expects($this->once())
-            ->method('postJson')
-            ->with($uri);
+            ->method('request')
+            ->with('post', $uri);
 
         call_user_func_array([$this->driver, $method], $params);
     }
@@ -134,17 +129,15 @@ class BrowserTest extends PHPUnit_Framework_TestCase
      */
     public function testExecuteJs()
     {
-        $expected = 'return value';
-
         $this->client
             ->expects($this->once())
-            ->method('postJson')
-            ->with('execute', ['script' => 'console.log("a")', 'args' => []])
-            ->willReturn($expected);
+            ->method('request')
+            ->with('post', 'execute', ['body' => '{"script":"console.log(\"a\")","args":[]}'])
+            ->willReturn(new Response(200, [], '{"value":"return value"}'));
 
         $result = $this->driver->executeJs('console.log("a")');
 
-        $this->assertEquals($expected, $result);
+        $this->assertEquals('return value', $result);
     }
 
 
@@ -177,9 +170,9 @@ class BrowserTest extends PHPUnit_Framework_TestCase
     {
         $this->client
             ->expects($this->once())
-            ->method('postJson')
-            ->with($uri, $value)
-            ->willReturn([['ELEMENT' => 3], ['ELEMENT' => 6]]);
+            ->method('request')
+            ->with('post', $uri, ['body' => json_encode($value)])
+            ->willReturn(new Response(200, [], '{"value":[{"ELEMENT":3},{"ELEMENT":6}]}'));
 
         $result = $this->driver->queryIds($query, $parent);
 
@@ -193,8 +186,8 @@ class BrowserTest extends PHPUnit_Framework_TestCase
     {
         $this->client
             ->expects($this->once())
-            ->method('postJson')
-            ->with('url', ['url' => 'http://example.com']);
+            ->method('request')
+            ->with('post', 'url', ['body' => '{"url":"http:\/\/example.com"}']);
 
         $this->driver->open(new Uri('http://example.com'));
     }
@@ -206,13 +199,13 @@ class BrowserTest extends PHPUnit_Framework_TestCase
     {
         $this->client
             ->expects($this->at(0))
-            ->method('postJson')
-            ->with('element/3/clear');
+            ->method('request')
+            ->with('post', 'element/3/clear');
 
         $this->client
             ->expects($this->at(1))
-            ->method('postJson')
-            ->with('element/3/value', ['value' => ['n', 'e', 'w']]);
+            ->method('request')
+            ->with('post', 'element/3/value', ['body' => '{"value":["n","e","w"]}']);
 
         $this->driver->setValue(3, 'new');
     }
@@ -224,8 +217,8 @@ class BrowserTest extends PHPUnit_Framework_TestCase
     {
         $this->client
             ->expects($this->once())
-            ->method('postJson')
-            ->with('element/3/value', ['value' => ['f', 'i', 'l', 'e', '.', 'j', 'p', 'g']]);
+            ->method('request')
+            ->with('post', 'element/3/value', ['body' => '{"value":["f","i","l","e",".","j","p","g"]}']);
 
         $this->driver->setFile(3, 'file.jpg');
     }
@@ -237,16 +230,15 @@ class BrowserTest extends PHPUnit_Framework_TestCase
     {
         $this->client
             ->expects($this->at(0))
-            ->method('getJson')
-            ->with('element/3/name')
-            ->willReturn('textarea');
+            ->method('request')
+            ->with('get', 'element/3/name')
+            ->willReturn(new Response(200, [], '{"value":"textarea"}'));
 
         $this->client
             ->expects($this->at(1))
-            ->method('getJson')
-            ->with('element/3/text')
-            ->willReturn('some text');
-
+            ->method('request')
+            ->with('get', 'element/3/text')
+            ->willReturn(new Response(200, [], '{"value":"some text"}'));
 
         $result = $this->driver->getValue(3);
 
@@ -260,15 +252,15 @@ class BrowserTest extends PHPUnit_Framework_TestCase
     {
         $this->client
             ->expects($this->at(0))
-            ->method('getJson')
-            ->with('element/5/name')
-            ->willReturn('input');
+            ->method('request')
+            ->with('get', 'element/5/name')
+            ->willReturn(new Response(200, [], '{"value":"input"}'));
 
         $this->client
             ->expects($this->at(1))
-            ->method('getJson')
-            ->with('element/5/attribute/value')
-            ->willReturn('some input text');
+            ->method('request')
+            ->with('get', 'element/5/attribute/value')
+            ->willReturn(new Response(200, [], '{"value":"some input text"}'));
 
         $result = $this->driver->getValue(5);
 
@@ -282,15 +274,13 @@ class BrowserTest extends PHPUnit_Framework_TestCase
     {
         $this->client
             ->expects($this->once())
-            ->method('postJson')
+            ->method('request')
             ->with(
+                'post',
                 'execute',
-                [
-                    'script' => 'return arguments[0].outerHTML',
-                    'args' => [['ELEMENT' => 4]],
-                ]
+                ['body' => '{"script":"return arguments[0].outerHTML","args":[{"ELEMENT":4}]}']
             )
-            ->willReturn('text html');
+            ->willReturn(new Response(200, [], '{"value":"text html"}'));
 
         $result = $this->driver->getHtml(4);
 
@@ -306,8 +296,9 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 
         $this->client
             ->expects($this->once())
-            ->method('getJson')
-            ->willReturn(base64_encode(file_get_contents(__FILE__)));
+            ->method('request')
+            ->with('get', 'screenshot')
+            ->willReturn(new Response(200, [], json_encode(['value' => base64_encode(file_get_contents(__FILE__))])));
 
         $this->driver->saveScreenshot($tempFile);
 
@@ -341,16 +332,14 @@ class BrowserTest extends PHPUnit_Framework_TestCase
      */
     public function testElementGetters($method, $params, $uri)
     {
-        $expected = 'some value';
-
         $this->client
             ->expects($this->once())
-            ->method('getJson')
-            ->with($uri)
-            ->willReturn($expected);
+            ->method('request')
+            ->with('get', $uri)
+            ->willReturn(new Response(200, [], '{"value":"some value"}'));
 
         $result = call_user_func_array([$this->driver, $method], $params);
 
-        $this->assertEquals($expected, $result);
+        $this->assertEquals('some value', $result);
     }
 }

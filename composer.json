@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "spiderling-php/attempt" : "^0.1",
+        "spiderling-php/attempt" : "^0.2",
         "spiderling-php/spiderling" : "dev-master",
         "symfony/process" : "^3.0",
         "guzzlehttp/guzzle" : "^6.1",

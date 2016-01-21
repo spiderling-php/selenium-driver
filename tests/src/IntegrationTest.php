@@ -4,7 +4,7 @@ namespace SP\SeleniumDriver\Test;
 
 use SP\DriverTest\BrowserDriverTest;
 use SP\SeleniumDriver\Browser;
-use SP\SeleniumDriver\Client;
+use SP\SeleniumDriver\Server;
 
 class IntegrationTest extends BrowserDriverTest
 {
@@ -18,7 +18,7 @@ class IntegrationTest extends BrowserDriverTest
             getenv('SAUCE_ACCESS_KEY')
         );
 
-        $client = new Client(['base_uri' => $base_uri]);
+        $server = new Server(['base_uri' => $base_uri]);
 
         $capabilities = [
             'browserName' => 'firefox',
@@ -28,7 +28,7 @@ class IntegrationTest extends BrowserDriverTest
             $capabilities['tunnel-identifier'] = getenv('TRAVIS_JOB_NUMBER');
         }
 
-        $driver = new Browser($client->newSessionClient($capabilities));
+        $driver = new Browser($server->newSessionClient($capabilities));
 
         self::setDriver($driver);
     }
