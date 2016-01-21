@@ -13,8 +13,14 @@ use RuntimeException;
  */
 class Server
 {
+    /**
+     * @var GuzzleHttp\Client
+     */
     private $client;
 
+    /**
+     * @param array $config
+     */
     public function __construct(array $config = [])
     {
         $this->client = new Client(
@@ -25,11 +31,18 @@ class Server
         );
     }
 
+    /**
+     * @return GuzzleHttp\Client
+     */
     public function getClient()
     {
         return $this->client;
     }
 
+    /**
+     * @param  array  $desiredCapabilities
+     * @return string
+     */
     public function newSessionBaseUri(array $desiredCapabilities = [])
     {
         $options = $desiredCapabilities
@@ -41,9 +54,20 @@ class Server
         $response = $client->request('post', 'session', ['body' => json_encode($options)]);
         $json = json_decode($response->getBody()->getContents(), true);
 
+        if (empty($json['sessionId'])) {
+            throw new RuntimeException(sprintf(
+                'No "sessionId" response. Maybe %s is not a valid selenium server',
+                $client->getConfig('base_uri')
+            ));
+        }
+
         return $client->getConfig('base_uri')."session/{$json['sessionId']}/";
     }
 
+    /**
+     * @param  array  $desiredCapabilities
+     * @return GuzzleHttp\Client
+     */
     public function newSessionClient(array $desiredCapabilities = [])
     {
         return new Client(['base_uri' => $this->newSessionBaseUri($desiredCapabilities)]);

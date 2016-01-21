@@ -30,13 +30,19 @@ class ServerTest extends PHPUnit_Framework_TestCase
         $client = $this->getMock('GuzzleHttp\Client');
 
         $client
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('request')
             ->with('post', 'session', ['body' => json_encode(['desiredCapabilities' => ['browserName' => 'firefox']])])
             ->willReturn(new Response(200, [], '{"sessionId":"123123"}'));
 
         $client
-            ->expects($this->once())
+            ->expects($this->at(2))
+            ->method('request')
+            ->with('post', 'session', ['body' => json_encode(['desiredCapabilities' => ['browserName' => 'firefox']])])
+            ->willReturn(new Response(200, [], '{}'));
+
+        $client
+            ->expects($this->exactly(2))
             ->method('getConfig')
             ->with('base_uri')
             ->willReturn('http://127.0.0.1:44412/wd/hub/');
@@ -47,13 +53,20 @@ class ServerTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $server
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getClient')
             ->willReturn($client);
 
         $base_uri = $server->newSessionBaseUri();
 
         $this->assertEquals('http://127.0.0.1:44412/wd/hub/session/123123/', (string) $base_uri);
+
+        $this->setExpectedException(
+            'RuntimeException',
+            'No "sessionId" response. Maybe http://127.0.0.1:44412/wd/hub/ is not a valid selenium server'
+        );
+
+        $server->newSessionBaseUri();
     }
 
     /**
